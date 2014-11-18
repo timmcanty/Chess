@@ -5,6 +5,7 @@ class Piece
     @board = board
     @moved = false
     @color = color # :w or :b
+    @board[pos] = self
   end
 
   attr_reader :color, :board, :pos
@@ -22,6 +23,7 @@ class Piece
 
   def match_color(piece)
     self.color == piece.color
+  end
 end
 
 class SlidingPiece < Piece
@@ -39,7 +41,6 @@ class SlidingPiece < Piece
         end
         possible_moves << new_pos
       end
-
     end
 
     possible_moves
