@@ -50,9 +50,15 @@ class Board
   end
 
   def move(start_pos, end_pos)
-
     raise NoPieceAtLocationError unless self[start_pos]
     raise InvalidMoveError unless self[start_pos].moves.include?(end_pos)
+    raise CannotMoveIntoCheckError if self[start_pos].move_into_check?(end_pos)
+
+    move!(start_pos, end_pos)
+
+  end
+
+  def move!(start_pos, end_pos)
 
     piece = self[start_pos]
     piece.pos = end_pos
@@ -77,21 +83,11 @@ class Board
   end
 end
 
-
-
-
-    # container_array = []
-    # return container_array << dup if none? { |el| el.is_a?(Array) } # base case : no nested array!
-    # arr.each do |el|
-    #   container_array << deep_dup(el) if el.is_a?(Array)
-    # end #recursive part!
-    #
-    # container_array
-
-
-
 class NoPieceAtLocationError < StandardError
 end
 
 class InvalidMoveError < StandardError
+end
+
+class CannotMoveIntoCheckError < StandardError
 end
