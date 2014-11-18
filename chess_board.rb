@@ -12,7 +12,7 @@ class Board
     @board[pos[0]][pos[1]]
   end
 
-  def []=(pos,value)  # board[pos] = something
+  def []=(pos,value)
      @board[pos[0]][pos[1]] = value
    end
 
@@ -67,7 +67,6 @@ class Board
     self[end_pos] = piece
 
   end
-
   def dup
     dup_board = Board.new
 
@@ -81,6 +80,17 @@ class Board
     end
     dup_board
   end
+
+  def checkmate?(color)
+    spaces.each do |space|
+      next if space.nil?
+
+      return false if space.color == color && !space.filtered_moves(space.moves).empty?
+    end
+    true
+  end
+
+
 end
 
 class NoPieceAtLocationError < StandardError

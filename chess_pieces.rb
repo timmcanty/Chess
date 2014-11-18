@@ -17,6 +17,7 @@ class Piece
 
 
   def moves
+
   end
 
   def add(pos1,pos2,dist=1)
@@ -39,6 +40,10 @@ class Piece
 
   end
 
+  def filtered_moves(poss_moves)
+    poss_moves.reject { |poss_move| move_into_check?(poss_move) }
+  end
+
 end
 
 class SlidingPiece < Piece
@@ -59,6 +64,8 @@ class SlidingPiece < Piece
     end
 
     possible_moves
+
+
   end
 
   def move_dirs
@@ -69,7 +76,11 @@ class SteppingPiece < Piece
 
   def moves
     valid_moves = possible_moves.map{ |move| add(move, pos)}
-    valid_moves.select{|move| board.valid?(move) && empty_or_opponent(move) }
+
+    valid_moves.select!{|move| board.valid?(move) && empty_or_opponent(move) }
+
+
+    valid_moves
   end
 
   def possible_moves
