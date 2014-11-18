@@ -8,8 +8,13 @@ class Piece
     @board[pos] = self
   end
 
-  attr_reader :color, :board
-  attr_accessor :moved, :pos
+  attr_reader :color
+  attr_accessor :moved, :pos, :board
+
+  def dup
+    self.class.new(pos.dup, Board.new, color)
+  end
+
 
   def moves
   end
@@ -25,6 +30,15 @@ class Piece
   def match_color(piece)
     self.color == piece.color
   end
+
+  def move_into_check?(end_pos)
+    dup_board = board.dup
+    dup_board.move( dup_board[self.pos].pos , end_pos )
+
+    dup_board.in_check?(self.color)
+
+  end
+
 end
 
 class SlidingPiece < Piece

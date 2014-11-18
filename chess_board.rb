@@ -60,19 +60,34 @@ class Board
     self[start_pos] = nil
     self[end_pos] = piece
 
-
-
-    # piece.pos = end_pos #updated
-    # piece.board = updated board <- autoupdate
-    # piece.moved = true #
-    #
-    # board.start_pos = nil
-    # board.end_pos = piece, but with new stuff
-
-
   end
 
+  def dup
+    dup_board = Board.new
+
+    dup_board.board.each_index do |row|
+      dup_board.board.each_index do |col|
+        if self[[row,col]]
+          dup_board[[row,col]] = self[[row,col]].dup
+          dup_board[[row,col]].board = dup_board
+        end
+      end
+    end
+    dup_board
+  end
 end
+
+
+
+
+    # container_array = []
+    # return container_array << dup if none? { |el| el.is_a?(Array) } # base case : no nested array!
+    # arr.each do |el|
+    #   container_array << deep_dup(el) if el.is_a?(Array)
+    # end #recursive part!
+    #
+    # container_array
+
 
 
 class NoPieceAtLocationError < StandardError
