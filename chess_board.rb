@@ -1,5 +1,3 @@
-require_relative 'chess_pieces.rb'
-
 class Board
 
   attr_accessor :board
