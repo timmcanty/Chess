@@ -88,6 +88,40 @@ class Board
     true
   end
 
+  def render
+    7.downto(0).each do |row|
+      print '|'
+      (0..7).each do |col|
+        print render_chars(self[[col,row]])
+        print '|'
+      end
+      puts
+      8.times { print '+-' }
+      print '+'
+      puts
+    end
+  end
+
+  def render_chars(space)
+    return " " if space.nil?
+    case space.class.to_s
+    # when nil
+    #   char =  " "
+    when 'Pawn'
+      char = (space.color == :w) ? '♙' : '♟'
+    when 'King'
+      char = (space.color == :w) ? "♔" : '♚'
+    when 'Queen'
+      char = (space.color == :w) ? '♕' : '♛'
+    when 'Rook'
+      char = (space.color == :w) ? '♖' : '♜'
+    when 'Knight'
+      char = (space.color == :w) ? '♘' : '♞'
+    when 'Bishop'
+      char = (space.color == :w) ? '♗' : '♝'
+    end
+    char
+  end
 
 end
 
