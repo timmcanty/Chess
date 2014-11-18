@@ -1,16 +1,27 @@
 class Piece
 
-  def initialize(pos,board)
+  def initialize(pos,board,color)
     @pos = pos
     @board = board
+    @moved = false
+    @color = color # :w or :b
   end
+
+  attr_reader :color, :board, :pos
 
   def moves
   end
 
-  def add_distance(pos1,pos2,dist)
+  def add(pos1,pos2,dist=1)
     [(pos1[0]+dist*pos2[0]), (pos1[1]+dist*pos2[1])]
   end
+
+  def moved?
+    @moved
+  end
+
+  def match_color(piece)
+    self.color == piece.color
 end
 
 class SlidingPiece < Piece
@@ -19,7 +30,7 @@ class SlidingPiece < Piece
 
     move_dirs.each do |dir|
       (1..7).each do |dist|
-        new_pos = add_distance(pos,dir,dist)
+        new_pos = add(pos,dir,dist)
         if !board.valid?(new_pos)
           break
         elsif board[new_pos]
@@ -47,8 +58,6 @@ class SteppingPiece < Piece
   def possible_moves
   end
 
-end
-class Pawn < Piece
 end
 
 class Bishop < SlidingPiece
@@ -83,3 +92,33 @@ class King < SteppingPiece
   def possible_moves
     [-1,0,1].product([-1,0,1]) - [[0,0]]
   end
+end
+
+
+class Pawn < Piece
+  def moves
+    possible_moves = move_dirs.map { |dir| add(pos,dir)}
+
+    possible_moves.each_with_index.select do |new_pos,i|
+      case i
+      when 0
+        !board[new_pos] && board[new_pos].valid?
+      when 1
+        !board[new_pos] && !moved?
+      when 2 || 3
+        board[new_pos] && !match_color(board[new_pos])
+      end
+    end
+
+
+  end
+
+  def move_dirs
+    if color == :w
+      [[0,1],[0,2],[-1,1],[1,1]]
+    else
+      [[0,-1],[0,-2],[-1,-1],[1,-1]]
+    end
+  end
+
+end
