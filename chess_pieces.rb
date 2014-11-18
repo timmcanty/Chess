@@ -8,7 +8,8 @@ class Piece
     @board[pos] = self
   end
 
-  attr_reader :color, :board, :pos
+  attr_reader :color, :board
+  attr_accessor :moved, :pos
 
   def moves
   end
