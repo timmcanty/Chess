@@ -53,10 +53,15 @@ end
 class SteppingPiece < Piece
 
   def moves
-    possible_moves.select{|move| board.valid?(move) && !match_color(board[move])}
+    valid_moves = possible_moves.map{ |move| add(move, pos)}
+    valid_moves.select{|move| board.valid?(move) && empty_or_opponent(move) }
   end
 
   def possible_moves
+  end
+
+  def empty_or_opponent(pos)
+    board[pos].nil? || !match_color(board[pos])
   end
 
 end
@@ -100,17 +105,20 @@ class Pawn < Piece
   def moves
     possible_moves = move_dirs.map { |dir| add(pos,dir)}
 
-    possible_moves.each_with_index.select do |new_pos,i|
+    valid_moves = possible_moves.select.each_with_index do |new_pos,i|
       case i
       when 0
-        !board[new_pos] && board[new_pos].valid?
+        !board[new_pos] && board.valid?(new_pos)
       when 1
         !board[new_pos] && !moved?
       when 2 || 3
         board[new_pos] && !match_color(board[new_pos])
+      when 3
+        board[new_pos] && !match_color(board[new_pos])
       end
     end
 
+    valid_moves
 
   end
 
