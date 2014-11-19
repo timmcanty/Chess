@@ -1,9 +1,10 @@
 require_relative 'chess_board.rb'
 require_relative 'chess_pieces.rb'
+require 'yaml'
 
 class Game
 
-  attr_accessor :board
+  attr_accessor :board, :black
 
   def initialize(player1,player2)
     @white = player1
@@ -13,20 +14,33 @@ class Game
 
     @board = Board.new.setup_board
 
+    player1.board = @board if player1.is_a?(ComputerPlayer)
+    player2.board = @board if player2.is_a?(ComputerPlayer)
+
 
   end
 
 
 
-  def run
+  def run(blacks_turn = false)
 
     turn = [@white, @black]
+    turn.rotate! if blacks_turn
 
     until over?(turn.first.color)
       begin
         @board.render
 
         command = turn.first.get_move
+
+        if command == :save
+          puts "Filename?"
+          filename = gets.chomp
+          f = File.open(filename, 'w')
+          f.puts ([self,turn.first.color].to_yaml)
+          f.close
+          return
+        end
         # :kingside or :queenside
 
         if command == :kingside
@@ -107,28 +121,33 @@ end
 class HumanPlayer < Player
 
   def get_move
-    name = "White" if self.color == :w
-    name = "Black" if self.color == :b
-    valid = false
+    begin
+      name = "White" if self.color == :w
+      name = "Black" if self.color == :b
+      valid = false
 
-    puts
-    until valid
-      puts "Make your Move, #{name}    ex: from, to"
-      input = gets.chomp
-      return :kingside if input == "O-O"
-      return :queenside if input == "O-O-O"
-      move = input.downcase.split(',').each { |part| part.strip!}
-      valid = move.all? { |pos| pos.match(/[a-h][1-8]/) }
+      puts
+      until valid
+        puts "Make your Move, #{name}    ex: from, to"
+        input = gets.chomp
+        return :save if input == "save"
+        return :kingside if input == "O-O"
+        return :queenside if input == "O-O-O"
+        move = input.downcase.split(',').each { |part| part.strip!}
+        valid = move.all? { |pos| pos.match(/[a-h][1-8]/) }
+      end
+
+      start_pos = parse(move[0])
+
+
+      end_pos = parse(move[1])
+
+
+
+      return [start_pos,end_pos]
+    rescue StandardError
+      retry
     end
-
-    start_pos = parse(move[0])
-
-
-    end_pos = parse(move[1])
-
-
-
-    [start_pos,end_pos]
   end
 
   def parse(string_cmd)
@@ -152,6 +171,33 @@ class HumanPlayer < Player
 
 end
 
+class ComputerPlayer < Player
+end
+
+class RandomComputer < ComputerPlayer
+
+  attr_accessor :board
+
+  def get_move
+    our_pieces = @board.pieces.select do |piece|
+      !piece.is_a?(EnPassantTracer) &&!piece.moves.empty? && piece.color == self.color
+    end
+
+    moved_piece = our_pieces.sample
+    p moved_piece.class
+    p moved_piece.color
+    p moved_piece.pos
+    p moved_piece.moves
+
+    [ board[ moved_piece.pos].pos, moved_piece.moves.sample]
+  end
+
+  def pick_promotion
+    'Q'
+  end
+end
+
+
 class NoPieceAtStartPosError < ChessError
 end
 
@@ -159,4 +205,20 @@ class InvalidCastlingError < ChessError
 end
 
 class NotYourPieceError < ChessError
+end
+
+if __FILE__ == $PROGRAM_NAME
+
+  unless ARGV.empty?
+    file = File.read(ARGV.shift)
+    data = YAML.load(file)
+    p data.class
+    game = data[0] # game
+    turn = data[1] # game
+    blacks_turn = false
+    blacks_turn = true if turn == :b
+    game.run(blacks_turn)
+  end
+
+  game = Game.new(HumanPlayer.new, HumanPlayer.new)
 end
