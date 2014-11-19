@@ -169,27 +169,32 @@ class HumanPlayer < Player
     input
   end
 
+
+
 end
 
 class ComputerPlayer < Player
+
+  attr_accessor :board
+
+  def random_move(pieces)
+
+    moved_piece = pieces.sample
+
+    [board[moved_piece.pos].pos, moved_piece.moves.sample ]
+  end
+
 end
 
 class RandomComputer < ComputerPlayer
 
-  attr_accessor :board
 
   def get_move
     our_pieces = @board.pieces.select do |piece|
       !piece.is_a?(EnPassantTracer) &&!piece.moves.empty? && piece.color == self.color
     end
 
-    moved_piece = our_pieces.sample
-    p moved_piece.class
-    p moved_piece.color
-    p moved_piece.pos
-    p moved_piece.moves
-
-    [ board[ moved_piece.pos].pos, moved_piece.moves.sample]
+    random_move(our_pieces)
   end
 
   def pick_promotion
@@ -197,6 +202,35 @@ class RandomComputer < ComputerPlayer
   end
 end
 
+class CapturingComputer < ComputerPlayer
+
+  def get_move
+    our_pieces = @board.pieces.select do |piece|
+      !piece.is_a?(EnPassantTracer) &&!piece.moves.empty? && piece.color == self.color
+    end
+
+    capturing_moves = []
+
+    our_pieces.each do |piece|
+      piece.moves.each do |move|
+
+        capturing_moves << [ @board[piece.pos].pos, move ] if ( @board[move] &&
+        !@board[move].is_a?(EnPassantTracer) )
+
+      end
+    end
+
+    return random_move(our_pieces) if capturing_moves.empty?
+
+
+    capturing_moves.sample
+  end
+
+  def pick_promotion
+    'Q'
+  end
+
+end
 
 class NoPieceAtStartPosError < ChessError
 end
@@ -221,4 +255,5 @@ if __FILE__ == $PROGRAM_NAME
   end
 
   game = Game.new(HumanPlayer.new, HumanPlayer.new)
+  game.run
 end
