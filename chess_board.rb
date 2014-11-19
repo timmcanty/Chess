@@ -221,7 +221,10 @@ class Board
     dup_board
   end
 
-
+  def stalemate?(color)
+    return false if self.in_check?(color)
+    pieces.all? { |piece| piece.color == color && piece.moves.empty?}
+  end
 
   def checkmate?(color)
     pieces.each do |piece|

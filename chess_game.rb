@@ -22,7 +22,7 @@ class Game
 
     turn = [@white, @black]
 
-    until over?
+    until over?(turn.first.color)
       begin
         @board.render
 
@@ -40,6 +40,8 @@ class Game
           turn.rotate!
           next
         end
+
+        raise NoPieceAtStartPosError unless @board[command[0]]
 
 
 
@@ -65,6 +67,10 @@ class Game
     end
 
     @board.render
+    if @board.stalemate?(turn.last.color)
+      puts "Stalemate! Nobody wins!"
+      return
+    end
     puts "Checkmate! White wins!" if winner == :w
     puts "Checkmate! Black wins!" if winner == :b
 
@@ -72,8 +78,8 @@ class Game
   end
 
 
-  def over?
-    @board.checkmate?(:w) || @board.checkmate?(:b)
+  def over?(color)
+    @board.stalemate?(color) || @board.checkmate?(color)
   end
 
 
@@ -144,6 +150,9 @@ class HumanPlayer < Player
     input
   end
 
+end
+
+class NoPieceAtStartPosError < ChessError
 end
 
 class InvalidCastlingError < ChessError
