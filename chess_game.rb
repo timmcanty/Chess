@@ -37,6 +37,8 @@ class Game
         retry
       end
 
+
+      @board.delete_tracers(turn.last.color)
       turn.rotate!
 
     end

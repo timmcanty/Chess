@@ -7,7 +7,7 @@ g.run
 
 ### TODO
 
-7. Bonus:
+Bonus:
 -add in Draws (stalemate, lack of pieces, 3 move rep, 50 move )
 -Castling
 -En Passant

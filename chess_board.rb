@@ -1,5 +1,9 @@
 class Board
 
+  # def destroy_tracer(color)
+      # pieces.each do  { |piece| board[piece.loc] = nil if piece.is_a?(EnPassantTracer)}
+  #
+
   attr_accessor :board
 
   def initialize
@@ -60,6 +64,7 @@ class Board
 
 
     pieces.each do |piece|
+      next if piece.is_a?(EnPassantTracer)
 
       return true if piece.color != color && piece.moves.include?(king_pos)
 
@@ -79,6 +84,10 @@ class Board
 
   def move!(start_pos, end_pos)
 
+    make_tracer(start_pos) if double_move_pawn(start_pos,end_pos)
+
+    en_passant_capture(start_pos, end_pos) if en_passant?(start_pos, end_pos)
+
     piece = self[start_pos]
     piece.pos = end_pos
     piece.moved = true
@@ -86,6 +95,31 @@ class Board
     self[end_pos] = piece
 
   end
+
+  def en_passant?(start_pos, end_pos)
+    self[start_pos].is_a?(Pawn) && self[end_pos].is_a?(EnPassantTracer)
+  end
+
+  def en_passant_capture(start_pos, end_pos)
+    self[ [ end_pos[0], start_pos[1] ] ] = nil
+  end
+
+  def make_tracer(start_pos)
+    color = self[start_pos].color
+    self[ [start_pos[0],start_pos[1] + 1 ]] = EnPassantTracer.new([start_pos[0],start_pos[1] + 1 ], self, :w) if color == :w
+    self[ [start_pos[0],start_pos[1] - 1 ]] = EnPassantTracer.new([start_pos[0],start_pos[1] - 1 ], self, :b) if color == :b
+  end
+
+  def delete_tracers(color)
+    pieces.each do |piece|
+      self[piece.pos] = nil if piece.is_a?(EnPassantTracer) && piece.color == color
+    end
+  end
+
+  def double_move_pawn(start_pos,end_pos)
+    self[start_pos].is_a?(Pawn) && ( (start_pos[1] - end_pos[1]).abs == 2)
+  end
+
   def dup
     dup_board = Board.new
 
@@ -100,6 +134,7 @@ class Board
 
   def checkmate?(color)
     pieces.each do |piece|
+      next if piece.is_a?(EnPassantTracer)
 
       return false if piece.color == color && !piece.filtered_moves(piece.moves).empty?
     end
@@ -123,7 +158,7 @@ class Board
   end
 
   def render_chars(space)
-    return " " if space.nil?
+    return " " if space.nil? || space.is_a?(EnPassantTracer)
     case space.class.to_s
     # when nil
     #   char =  " "

@@ -55,7 +55,7 @@ class SlidingPiece < Piece
         new_pos = add(pos,dir,dist)
         if !board.valid?(new_pos)
           break
-        elsif board[new_pos]
+        elsif board[new_pos] && !board[new_pos].is_a?(EnPassantTracer)
           possible_moves << new_pos unless match_color(board[new_pos])
           break
         end
@@ -156,5 +156,11 @@ class Pawn < Piece
       [[0,-1],[0,-2],[-1,-1],[1,-1]]
     end
   end
+
+end
+
+class EnPassantTracer < Piece
+  attr_accessor :color
+
 
 end
