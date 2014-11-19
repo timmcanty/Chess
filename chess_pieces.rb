@@ -10,13 +10,13 @@ class Piece
 
   attr_reader :color
   attr_accessor :moved, :pos, :board
+
   def dup
     self.class.new(pos.dup, Board.new, color)
   end
 
 
   def moves
-
   end
 
   def add(pos1,pos2,dist=1)
@@ -35,14 +35,8 @@ class Piece
     dup_board = board.dup
     dup_board.move!( self.pos , end_pos )
 
-    if dup_board.in_check?(self.color)
-      dup_board.render
-      return dup_board
-    end
-
-    return false
-
-
+    return true if dup_board.in_check?(self.color)
+    false
   end
 
   def filtered_moves(poss_moves)
@@ -146,7 +140,7 @@ class Pawn < Piece
       when 2
         board.valid?(new_pos) && board[new_pos] && !match_color(board[new_pos])
       when 3
-        board.valid?(new_pos) && board[new_pos] && !match_color(board[new_pos])  
+        board.valid?(new_pos) && board[new_pos] && !match_color(board[new_pos])
       end
     end
 
