@@ -56,7 +56,31 @@ class Board
     spaces.reject { |space| space.nil?}
   end
 
+  def pawns
+    pieces.select { |piece| piece.is_a?(Pawn)}
+  end
 
+
+  def pawns_with_promotion
+    pawns.select { |piece| piece.pos[1] == 0 || piece.pos[1] == 7}
+  end
+
+  def promote(promotion)
+    raise "HORRIBLE MISTAKE!!!!" if pawns_with_promotion.size != 1
+    promotion_pos = pawns_with_promotion[0].pos
+    promotion_col = pawns_with_promotion[0].color
+
+    case promotion
+    when 'Q'
+      self[promotion_pos] = Queen.new(promotion_pos, self, promotion_col)
+    when 'R'
+      self[promotion_pos] = Rook.new(promotion_pos, self, promotion_col)
+    when 'B'
+      self[promotion_pos] = Bishop.new(promotion_pos, self, promotion_col)
+    when 'N'
+      self[promotion_pos] = Knight.new(promotion_pos, self, promotion_col)
+    end
+  end
 
   def in_check?(color)
 
@@ -127,7 +151,7 @@ class Board
 
     true
   end
-  
+
   def kingside(color)
     if color == :w
       row = 0

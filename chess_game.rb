@@ -47,6 +47,12 @@ class Game
 
         @board.move(*command)
 
+        if !@board.pawns_with_promotion.empty?
+          @board.render
+          promotion = turn.first.pick_promotion
+          @board.promote(promotion)
+        end
+
       rescue ChessError => e
         puts e.message
         retry
@@ -87,6 +93,9 @@ class Player
   def get_move
   end
 
+  def pick_promotion
+  end
+
 end
 
 class HumanPlayer < Player
@@ -121,6 +130,18 @@ class HumanPlayer < Player
     row = string_cmd[1].to_i - 1
 
     [col,row]
+  end
+
+  def pick_promotion
+    valid = false
+
+    until valid
+      puts "Promote to which piece? ( Q, R, B, N)"
+      input = gets.chomp.upcase
+      valid = true if ['Q','R','B','N'].include?(input)
+    end
+
+    input
   end
 
 end
