@@ -1,9 +1,14 @@
 # Chess
 
+Startup:
+load 'chess_game.rb'
+g = Game.new(HumanPlayer.new,HumanPlayer.new)
+g.run
 
-## Phases
-1. Pieces
-2. Board
-3. Piece#valid_moves
-4. Board#checkmate?(color)
-5. Game
+### TODO
+
+7. Bonus:
+-add in Draws (stalemate, lack of pieces, 3 move rep, 50 move )
+-Castling
+-En Passant
+-Pawn Promotion

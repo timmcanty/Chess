@@ -130,7 +130,7 @@ end
 class Pawn < Piece
   def moves
     possible_moves = move_dirs.map { |dir| add(pos,dir)}
-    possible_moves = possible_moves.select { |x,y| x.between?(0,7) && y.between?(0,7)}
+    possible_moves = possible_moves.select { |pos| board.valid?(pos) }
 
     valid_moves = possible_moves.select.each_with_index do |new_pos,i|
       case i
@@ -138,7 +138,7 @@ class Pawn < Piece
         !board[new_pos] && board.valid?(new_pos)
       when 1
         !board[new_pos] && !moved?
-      when 2 || 3
+      when 2
         board[new_pos] && !match_color(board[new_pos])
       when 3
         board[new_pos] && !match_color(board[new_pos])

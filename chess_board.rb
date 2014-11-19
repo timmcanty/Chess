@@ -6,6 +6,26 @@ class Board
     @board = Array.new(8) { Array.new(8, nil) }
   end
 
+  def place_pieces( back_row = 0, pawn_row = 1, color = :w )
+
+    [[0,back_row],[7,back_row]].each { |pos| Rook.new( pos,self,color)}
+    [[1,back_row],[6,back_row]].each { |pos| Knight.new( pos,self,color)}
+    [[2,back_row],[5,back_row]].each { |pos| Bishop.new( pos,self,color)}
+
+    King.new( [4,back_row], self, color )
+    Queen.new( [3,back_row], self, color )
+
+    (0..7).each { |i| Pawn.new( [i,pawn_row], self, color )}
+
+  end
+
+  def setup_board
+    place_pieces
+    place_pieces( 7, 6, :b )
+
+    self
+  end
+
   def [](pos)
     @board[pos[0]][pos[1]]
   end
@@ -19,16 +39,17 @@ class Board
   end
 
   def find_king(color)
-    king = nil
-    spaces.each { |space| king = space if space.class == King &&
-      space.color == color }
+    king_index = pieces.find_index { |piece| piece.is_a?(King) && piece.color == color}
 
-    return king.pos unless king.nil?
-    nil
+    return pieces[king_index].pos
   end
 
   def spaces
     @board.flatten
+  end
+
+  def pieces
+    spaces.reject { |space| space.nil?}
   end
 
 
@@ -38,11 +59,9 @@ class Board
     king_pos = find_king(color)
 
 
-    spaces.each do |space|
-      next unless space
+    pieces.each do |piece|
 
-
-      return true if space.color != color && space.moves.include?(king_pos)
+      return true if piece.color != color && piece.moves.include?(king_pos)
 
     end
 
@@ -70,22 +89,19 @@ class Board
   def dup
     dup_board = Board.new
 
-    dup_board.board.each_index do |row|
-      dup_board.board.each_index do |col|
-        if self[[row,col]]
-          dup_board[[row,col]] = self[[row,col]].dup
-          dup_board[[row,col]].board = dup_board
-        end
-      end
+    pieces.each do |piece|
+      dup_board[piece.pos] = piece.dup
     end
+
     dup_board
   end
 
-  def checkmate?(color)
-    spaces.each do |space|
-      next if space.nil?
 
-      return false if space.color == color && !space.filtered_moves(space.moves).empty?
+
+  def checkmate?(color)
+    pieces.each do |piece|
+
+      return false if piece.color == color && !piece.filtered_moves(piece.moves).empty?
     end
     true
   end
@@ -129,11 +145,14 @@ class Board
 
 end
 
-class NoPieceAtLocationError < StandardError
+class ChessError < StandardError
 end
 
-class InvalidMoveError < StandardError
+class NoPieceAtLocationError < ChessError
 end
 
-class CannotMoveIntoCheckError < StandardError
+class InvalidMoveError < ChessError
+end
+
+class CannotMoveIntoCheckError < ChessError
 end

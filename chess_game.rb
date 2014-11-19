@@ -7,54 +7,32 @@ class Game
 
   def initialize(player1,player2)
     @white = player1
+    player1.color = :w
     @black = player2
-    @board = Board.new
-    place_pieces
-    place_pieces( 7, 6, :b )
-  end
+    player2.color = :b
 
-  def place_pieces( back_row = 0, pawn_row = 1, color = :w )
+    @board = Board.new.setup_board
 
-    [[0,back_row],[7,back_row]].each { |pos| Rook.new( pos,board,color)}
-    [[1,back_row],[6,back_row]].each { |pos| Knight.new( pos,board,color)}
-    [[2,back_row],[5,back_row]].each { |pos| Bishop.new( pos,board,color)}
-
-    King.new( [4,back_row], board, color )
-    Queen.new( [3,back_row], board, color )
-
-    (0..7).each { |i| Pawn.new( [i,pawn_row], board, color )}
 
   end
+
 
 
   def run
 
-    turn = [:w, :b]
+    turn = [@white, @black]
 
     until over?
       begin
         @board.render
 
-        if turn.first == :w
-          command = @white.get_move(:w)
-        else
-          command = @black.get_move(:b)
-        end
+        command = turn.first.get_move
 
-        raise NotYourPieceError unless turn.first == @board[command[0]].color
+        raise NotYourPieceError unless turn.first.color == @board[command[0]].color
 
         @board.move(*command)
 
-      rescue NoPieceAtLocationError => e
-        puts e.message
-        retry
-      rescue InvalidMoveError => e
-        puts e.message
-        retry
-      rescue CannotMoveIntoCheckError => e
-        puts e.message
-        retry
-      rescue NotYourPieceError => e
+      rescue ChessError => e
         puts e.message
         retry
       end
@@ -87,21 +65,23 @@ end
 
 class Player
 
-  def get_move(color)
+  attr_accessor :color
+
+  def get_move
   end
 
 end
 
 class HumanPlayer < Player
 
-  def get_move(color)
-    name = "White" if color == :w
-    name = "Black" if color == :b
+  def get_move
+    name = "White" if self.color == :w
+    name = "Black" if self.color == :b
     valid = false
 
     puts
     until valid
-      puts "Make your Move, #{name}    ex: from, to" # "f2, f3"
+      puts "Make your Move, #{name}    ex: from, to"
       move = gets.chomp.downcase.split(',').each { |part| part.strip!}
       valid = move.all? { |pos| pos.match(/[a-h][1-8]/) }
     end
@@ -125,5 +105,5 @@ class HumanPlayer < Player
 
 end
 
-class NotYourPieceError < StandardError
+class NotYourPieceError < ChessError
 end
