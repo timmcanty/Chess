@@ -21,7 +21,7 @@ class Piece
   end
 
   def add(pos1,pos2,dist=1)
-    [(pos1[0]+dist*pos2[0]), (pos1[1]+dist*pos2[1])]
+    [(pos1[0] + dist * pos2[0]), (pos1[1] + dist * pos2[1])]
   end
 
   def moved?
@@ -34,7 +34,7 @@ class Piece
 
   def move_into_check?(end_pos)
     dup_board = board.dup
-    dup_board.move!( dup_board[self.pos].pos , end_pos )
+    dup_board.move!( self.pos , end_pos )
 
     dup_board.in_check?(self.color)
 
@@ -130,6 +130,7 @@ end
 class Pawn < Piece
   def moves
     possible_moves = move_dirs.map { |dir| add(pos,dir)}
+    possible_moves = possible_moves.select { |x,y| x.between?(0,7) && y.between?(0,7)}
 
     valid_moves = possible_moves.select.each_with_index do |new_pos,i|
       case i

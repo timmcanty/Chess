@@ -26,10 +26,104 @@ class Game
 
   end
 
+
+  def run
+
+    turn = [:w, :b]
+
+    until over?
+      begin
+        @board.render
+
+        if turn.first == :w
+          command = @white.get_move(:w)
+        else
+          command = @black.get_move(:b)
+        end
+
+        raise NotYourPieceError unless turn.first == @board[command[0]].color
+
+        @board.move(*command)
+
+      rescue NoPieceAtLocationError => e
+        puts e.message
+        retry
+      rescue InvalidMoveError => e
+        puts e.message
+        retry
+      rescue CannotMoveIntoCheckError => e
+        puts e.message
+        retry
+      rescue NotYourPieceError => e
+        puts e.message
+        retry
+      end
+
+      turn.rotate!
+
+    end
+
+    @board.render
+    puts "Checkmate! White wins!" if winner == :w
+    puts "Checkmate! Black wins!" if winner == :b
+
+
+  end
+
+
+  def over?
+    @board.checkmate?(:w) || @board.checkmate?(:b)
+  end
+
+
+
+  def winner
+    :w if @board.checkmate?(:b)
+    :b if @board.checkmate?(:w)
+  end
+
+
 end
 
 class Player
+
+  def get_move(color)
+  end
+
 end
 
 class HumanPlayer < Player
+
+  def get_move(color)
+    name = "White" if color == :w
+    name = "Black" if color == :b
+    valid = false
+
+    puts
+    until valid
+      puts "Make your Move, #{name}    ex: from, to" # "f2, f3"
+      move = gets.chomp.downcase.split(',').each { |part| part.strip!}
+      valid = move.all? { |pos| pos.match(/[a-h][1-8]/) }
+    end
+
+    start_pos = parse(move[0])
+
+
+    end_pos = parse(move[1])
+
+
+
+    [start_pos,end_pos]
+  end
+
+  def parse(string_cmd)
+    col = string_cmd[0].ord - 97
+    row = string_cmd[1].to_i - 1
+
+    [col,row]
+  end
+
+end
+
+class NotYourPieceError < StandardError
 end

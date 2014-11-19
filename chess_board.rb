@@ -37,9 +37,11 @@ class Board
 
     king_pos = find_king(color)
 
-    spaces.each do |space|
 
+    spaces.each do |space|
       next unless space
+
+
       return true if space.color != color && space.moves.include?(king_pos)
 
     end
@@ -90,16 +92,18 @@ class Board
 
   def render
     7.downto(0).each do |row|
-      print '|'
+      print "  #{row+1}  | "
       (0..7).each do |col|
         print render_chars(self[[col,row]])
-        print '|'
+        print ' | '
       end
       puts
-      8.times { print '+-' }
+      print '     '
+      8.times { print '+---' }
       print '+'
       puts
     end
+    puts "     | a | b | c | d | e | f | g | h |"
   end
 
   def render_chars(space)
