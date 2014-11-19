@@ -36,7 +36,13 @@ class Piece
     dup_board = board.dup
     dup_board.move!( self.pos , end_pos )
 
-    dup_board.in_check?(self.color)
+    if dup_board.in_check?(self.color)
+      dup_board.render
+      return dup_board
+    end
+
+    return false
+
 
   end
 

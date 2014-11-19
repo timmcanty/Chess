@@ -27,6 +27,21 @@ class Game
         @board.render
 
         command = turn.first.get_move
+        # :kingside or :queenside
+
+        if command == :kingside
+          raise InvalidCastlingError unless @board.kingside?(turn.first.color)
+          @board.kingside(turn.first.color)
+          turn.rotate!
+          next
+        elsif command == :queenside
+          raise InvalidCastlingError unless @board.queenside?(turn.first.color)
+          @board.queenside(turn.first.color)
+          turn.rotate!
+          next
+        end
+
+
 
         raise NotYourPieceError unless turn.first.color == @board[command[0]].color
 
@@ -84,7 +99,10 @@ class HumanPlayer < Player
     puts
     until valid
       puts "Make your Move, #{name}    ex: from, to"
-      move = gets.chomp.downcase.split(',').each { |part| part.strip!}
+      input = gets.chomp
+      return :kingside if input == "O-O"
+      return :queenside if input == "O-O-O"
+      move = input.downcase.split(',').each { |part| part.strip!}
       valid = move.all? { |pos| pos.match(/[a-h][1-8]/) }
     end
 
@@ -105,6 +123,9 @@ class HumanPlayer < Player
     [col,row]
   end
 
+end
+
+class InvalidCastlingError < ChessError
 end
 
 class NotYourPieceError < ChessError

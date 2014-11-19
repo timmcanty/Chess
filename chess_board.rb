@@ -78,15 +78,19 @@ class Board
     raise InvalidMoveError unless self[start_pos].moves.include?(end_pos)
     raise CannotMoveIntoCheckError if self[start_pos].move_into_check?(end_pos)
 
+    make_tracer(start_pos) if double_move_pawn(start_pos,end_pos)
+
+    en_passant_capture(start_pos, end_pos) if en_passant?(start_pos, end_pos)
+
     move!(start_pos, end_pos)
 
   end
 
   def move!(start_pos, end_pos)
 
-    make_tracer(start_pos) if double_move_pawn(start_pos,end_pos)
-
-    en_passant_capture(start_pos, end_pos) if en_passant?(start_pos, end_pos)
+    # make_tracer(start_pos) if double_move_pawn(start_pos,end_pos)
+    #
+    # en_passant_capture(start_pos, end_pos) if en_passant?(start_pos, end_pos)
 
     piece = self[start_pos]
     piece.pos = end_pos
@@ -102,6 +106,68 @@ class Board
 
   def en_passant_capture(start_pos, end_pos)
     self[ [ end_pos[0], start_pos[1] ] ] = nil
+  end
+
+  def kingside?(color)
+
+    if color == :w
+      row = 0
+    else
+      row = 7
+    end
+
+
+    return false if self[[5,row]]
+    return false if self[[6,row]]
+    return false if self[[4,row]].moved?
+    return false if self[[7,row]].moved?
+    return false if self.in_check?(color)
+    return false if self[[4,row]].move_into_check?([6,row])
+    return false if self[[4,row]].move_into_check?([5,row])
+
+    true
+  end
+  
+  def kingside(color)
+    if color == :w
+      row = 0
+    else
+      row = 7
+    end
+
+    self.move!([4,row], [6,row])
+    self.move!([7,row], [5,row])
+  end
+
+  def queenside?(color)
+    if color == :w
+      row = 0
+    else
+      row = 7
+    end
+
+    return false if self[[1,row]]
+    return false if self[[2,row]]
+    return false if self[[3,row]]
+    return false if self[[4,row]].moved?
+    return false if self[[0,row]].moved?
+    return false if self.in_check?(color)
+    return false if self[[4,row]].move_into_check?([3,row])
+    return false if self[[4,row]].move_into_check?([2,row])
+
+
+    true
+  end
+
+  def queenside(color)
+    if color == :w
+      row = 0
+    else
+      row = 7
+    end
+
+    self.move!([4,row], [2,row])
+    self.move!([0,row], [3,row])
   end
 
   def make_tracer(start_pos)
@@ -125,6 +191,7 @@ class Board
 
     pieces.each do |piece|
       dup_board[piece.pos] = piece.dup
+      dup_board[piece.pos].board = dup_board
     end
 
     dup_board
