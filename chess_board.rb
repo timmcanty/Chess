@@ -1,3 +1,4 @@
+require_relative 'chess_board_eval.rb'
 class Board
 
   # def destroy_tracer(color)
