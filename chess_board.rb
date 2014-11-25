@@ -192,8 +192,8 @@ class Board
 
   def make_tracer(start_pos)
     color = self[start_pos].color
-    self[ [start_pos[0],start_pos[1] + 1 ]] = EnPassantTracer.new([start_pos[0],start_pos[1] + 1 ], self, :w) if color == :w
-    self[ [start_pos[0],start_pos[1] - 1 ]] = EnPassantTracer.new([start_pos[0],start_pos[1] - 1 ], self, :b) if color == :b
+    spaces = (color == :w ? 1 : -1)
+    self[ [start_pos[0],start_pos[1] + spaces ]] = EnPassantTracer.new([start_pos[0],start_pos[1] + spaces ], self, color)
   end
 
   def delete_tracers(color)
