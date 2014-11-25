@@ -5,7 +5,6 @@ class SteppingPiece < Piece
     valid_moves = possible_moves.map{ |move| Piece.add_pos(move, pos)}
     valid_moves.select!{|move| empty_or_opponent?(move) }
 
-
     valid_moves
   end
 

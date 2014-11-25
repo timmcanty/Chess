@@ -112,11 +112,6 @@ class Board
   end
 
   def move!(start_pos, end_pos)
-
-    # make_tracer(start_pos) if double_move_pawn(start_pos,end_pos)
-    #
-    # en_passant_capture(start_pos, end_pos) if en_passant?(start_pos, end_pos)
-
     piece = self[start_pos]
     piece.pos = end_pos
     piece.moved = true
@@ -271,6 +266,10 @@ class Board
       char = (space.color == :w) ? '♗' : '♝'
     end
     char
+  end
+
+  def tracer?(pos)
+    self[pos].is_a?(EnPassantTracer)
   end
 
 end

@@ -8,7 +8,7 @@ class SlidingPiece < Piece
         new_pos = Piece.add_pos(pos,dir,dist)
         next unless board.valid?(new_pos)
 
-        if board[new_pos] && !board[new_pos].is_a?(EnPassantTracer)
+        if board[new_pos] && !board.tracer?(new_pos)
           possible_moves << new_pos unless match_color(board[new_pos])
           break
         end
