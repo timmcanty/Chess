@@ -1,4 +1,9 @@
+
 class Piece
+
+  def self.add_pos(pos1,pos2,dist=1)
+    [(pos1[0] + dist * pos2[0]), (pos1[1] + dist * pos2[1])]
+  end
 
   def initialize(pos,board,color)
     @pos = pos
@@ -15,28 +20,22 @@ class Piece
     self.class.new(pos.dup, Board.new, color)
   end
 
-
   def moves
   end
 
-  def add(pos1,pos2,dist=1)
-    [(pos1[0] + dist * pos2[0]), (pos1[1] + dist * pos2[1])]
-  end
-
   def moved?
-    @moved
+    moved
   end
 
   def match_color(piece)
-    self.color == piece.color
+    color == piece.color
   end
 
   def move_into_check?(end_pos)
     dup_board = board.dup
-    dup_board.move!( self.pos , end_pos )
+    dup_board.move!( pos , end_pos )
 
-    return true if dup_board.in_check?(self.color)
-    false
+    dup_board.in_check?(color)
   end
 
   def filtered_moves(poss_moves)
@@ -45,102 +44,20 @@ class Piece
 
 end
 
-class SlidingPiece < Piece
-  def moves
-    possible_moves = []
-
-    move_dirs.each do |dir|
-      (1..7).each do |dist|
-        new_pos = add(pos,dir,dist)
-        if !board.valid?(new_pos)
-          break
-        elsif board[new_pos] && !board[new_pos].is_a?(EnPassantTracer)
-          possible_moves << new_pos unless match_color(board[new_pos])
-          break
-        end
-        possible_moves << new_pos
-      end
-    end
-
-    possible_moves
-
-
-  end
-
-  def move_dirs
-  end
-end
-
-class SteppingPiece < Piece
-
-  def moves
-    valid_moves = possible_moves.map{ |move| add(move, pos)}
-
-    valid_moves.select!{|move| board.valid?(move) && empty_or_opponent(move) }
-
-
-    valid_moves
-  end
-
-  def possible_moves
-  end
-
-  def empty_or_opponent(pos)
-    board[pos].nil? || !match_color(board[pos])
-  end
-
-end
-
-class Bishop < SlidingPiece
-  def move_dirs
-    [-1,1].product([-1,1])
-  end
-end
-
-class Rook < SlidingPiece
-  def move_dirs
-    [ [1,0],
-      [0,1],
-      [-1,0],
-      [0,-1]
-      ]
-  end
-end
-
-class Queen < SlidingPiece
-  def move_dirs
-    [-1,0,1].product([-1,0,1]) - [[0,0]]
-  end
-end
-
-class Knight < SteppingPiece
-  def possible_moves
-    [[-2,-1],[-2,1],[-1,2],[-1,-2],[1,-2],[1,2],[2,-1],[2,1]]
-  end
-end
-
-class King < SteppingPiece
-  def possible_moves
-    [-1,0,1].product([-1,0,1]) - [[0,0]]
-  end
-end
-
-
 class Pawn < Piece
   def moves
-    possible_moves = move_dirs.map { |dir| add(pos,dir)}
-    #possible_moves = possible_moves.select { |pos| board.valid?(pos) }
+    possible_moves = move_dirs.map { |dir| Piece.add_pos(pos,dir)}
 
     valid_moves = possible_moves.select.each_with_index do |new_pos,i|
       case i
       when 0
-        board.valid?(new_pos) && !board[new_pos]
+        single_move?(new_pos)
       when 1
-        board.valid?(new_pos) && !board[new_pos] && !moved?
+        double_move?(new_pos)
       when 2
-        board.valid?(new_pos) && board[new_pos] && !match_color(board[new_pos])
+        capture?(new_pos)
       when 3
-        board.valid?(new_pos) && board[new_pos] && !match_color(board[new_pos])
+        capture?(new_pos)
       end
     end
 
@@ -156,10 +73,20 @@ class Pawn < Piece
     end
   end
 
+  def single_move?(new_pos)
+    board.valid?(new_pos) && !board[new_pos]
+  end
+
+  def double_move?(new_pos)
+    board.valid?(new_pos) && !board[new_pos] && !moved?
+  end
+
+  def capture?(new_pos)
+    board.valid?(new_pos) && board[new_pos] && !match_color(board[new_pos])
+  end
+
 end
 
 class EnPassantTracer < Piece
   attr_accessor :color
-
-
 end

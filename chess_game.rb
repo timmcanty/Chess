@@ -1,5 +1,7 @@
 require_relative 'chess_board.rb'
 require_relative 'chess_pieces.rb'
+require_relative 'chess_sliding.rb'
+require_relative 'chess_stepping.rb'
 require_relative 'tree_node.rb'
 require 'yaml'
 
@@ -30,7 +32,7 @@ class Game
 
     until over?(turn.first.color)
       begin
-        @board.render
+        board.render
 
         command = turn.first.get_move
 
