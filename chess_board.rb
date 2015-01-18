@@ -1,9 +1,6 @@
 require_relative 'chess_board_eval.rb'
-class Board
 
-  # def destroy_tracer(color)
-      # pieces.each do  { |piece| board[piece.loc] = nil if piece.is_a?(EnPassantTracer)}
-  #
+class Board
 
   attr_accessor :board
 
@@ -21,7 +18,6 @@ class Board
     Queen.new( [3,back_row], self, color )
 
     (0..7).each { |i| Pawn.new( [i,pawn_row], self, color )}
-
   end
 
   def setup_board
@@ -54,7 +50,7 @@ class Board
   end
 
   def pieces
-    spaces.reject { |space| space.nil?}
+    spaces.compact
   end
 
   def pawns
@@ -67,7 +63,6 @@ class Board
   end
 
   def promote(promotion)
-    raise "HORRIBLE MISTAKE!!!!" if pawns_with_promotion.size != 1
     promotion_pos = pawns_with_promotion[0].pos
     promotion_col = pawns_with_promotion[0].color
 
