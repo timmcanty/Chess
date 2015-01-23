@@ -1,4 +1,4 @@
-require_relative 'chess_board_eval.rb'
+
 
 class Board
 
