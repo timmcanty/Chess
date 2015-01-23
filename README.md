@@ -1,19 +1,17 @@
 # Chess
 
-Startup:
-load 'chess_game.rb'
-g = Game.new(HumanPlayer.new,HumanPlayer.new)
-g.run
+##Description
+Ruby implemented Chess game. Allows two players to play on a terminal screen with terminal inputted moves.
 
-### TODO
+##Features
+* Uses Slideable and Steppable classes to maintain DRY code.
+* Uses an EnPassantTracer object on the chessboard to provide an OO solution to en passant.
+* Performs deep duping on the Board object in order to assess the validity of player moves.
 
+##Startup
+* Download repo
+* In console, type 'ruby chess_game.rb'
 
-Bonus:
--add in Draws (stalemate, lack of pieces, 3 move rep, 50 move )
--Pawn Promotion
-
-
-
-
--pawn_promotion
-  -check mov
+## TODOs
+* Add in draw conditions (stalemate, lack of pieces, 3 move rep, 50 move no-capture)
+* Computer Player implementation.
